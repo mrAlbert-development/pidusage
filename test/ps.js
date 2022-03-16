@@ -162,12 +162,17 @@ test('should be able to set usePs from env var', async t => {
   })
 
   const beforeValue = process.env.PIDUSAGE_USE_PS
-  process.env.PIDUSAGE_USE_PS = '1'
+  const possibilities = ['1', 'true']
 
-  const pidusage = require('../')
-  pidusage(1, () => {})
+  for (const possibility of possibilities) {
+    usePsFromStats = undefined
+    process.env.PIDUSAGE_USE_PS = possibility
 
-  t.is(usePsFromStats, true)
+    const pidusage = require('../')
+    await pidusage(1, () => {})
+
+    t.is(usePsFromStats, true)
+  }
 
   process.env.PIDUSAGE_USE_PS = beforeValue
   mockery.deregisterMock('./lib/stats')
